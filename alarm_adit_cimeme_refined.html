@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>Alarm Adit | Cimeme</title>
+<style>
+:root{color-scheme:dark;--bg:#101318;--surface:#191e26;--surface-soft:#202630;--line:#303844;--muted:#9ca7b6;--white:#f3f5f7;--accent:#e7b66a;--red:#e56c72;--green:#83c99a}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:32px 18px;display:grid;place-items:center;background:var(--bg);font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--white)}
+.page{width:min(100%,740px)}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 3px 18px;color:var(--muted);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+.brand{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:750;letter-spacing:.04em}
+.brand-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#2c313a;color:var(--accent);font-size:1.15rem}
+.live{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;letter-spacing:0;font-size:.76rem;text-transform:none}
+.dot{width:7px;height:7px;border-radius:50%;background:#687383}.dot.on{background:var(--green)}
+.card{position:relative;overflow:hidden;padding:clamp(24px,5vw,42px);border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:0 18px 45px #0002}
+.eyebrow{font-size:.74rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-size:clamp(1.8rem,4vw,2.45rem);margin:10px 0 5px;letter-spacing:-.035em}
+.subtitle{color:var(--muted);margin:0;line-height:1.5}
+.clock-wrap{margin:34px 0 28px;text-align:center}
+.clock{font-family:"SFMono-Regular",Consolas,monospace;font-size:clamp(3rem,12vw,6rem);font-weight:700;letter-spacing:-.055em;line-height:1.1;font-variant-numeric:tabular-nums}
+.date{margin-top:12px;color:var(--muted);font-size:.94rem}
+.status-card{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:19px;border:1px solid var(--line);border-radius:13px;background:#14181f}
+.status-label{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.shift{font-size:1.3rem;font-weight:750}
+.status-message{margin-top:7px;color:var(--muted);line-height:1.55;font-size:.9rem}
+.pill{padding:7px 10px;border-radius:7px;background:var(--surface-soft);border:1px solid var(--line);font-size:.73rem;color:var(--muted);white-space:nowrap}
+.pill.active{color:var(--green);border-color:#456d51;background:#1b2a20}
+.pill.off{color:var(--accent);border-color:#665337;background:#292319}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:13px}
+.shift-tile{border:1px solid var(--line);border-radius:12px;padding:15px;background:#1c222b}
+.tile-name{font-size:.78rem;color:var(--muted);margin-bottom:9px}
+.tile-time{font-weight:700;font-size:.98rem}
+.tile-sub{font-size:.72rem;color:#7f8a99;margin-top:5px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+button{flex:1;min-width:170px;border:1px solid transparent;border-radius:10px;padding:14px 16px;font-size:.9rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+button:hover:not(:disabled){filter:brightness(1.08)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.primary{color:#1b1b1b;background:var(--accent)}
+.secondary{color:var(--white);background:#252b34;border-color:#39414d}
+.danger{color:#fff;background:#a9414a}
+.footer{display:flex;justify-content:space-between;gap:12px;margin:17px 3px 0;color:#7f8997;font-size:.76rem;line-height:1.5}
+.alarm-flash{animation:flash .65s infinite alternate}
+@keyframes flash{from{box-shadow:0 18px 45px #0002,inset 0 0 0 1px #e56c7222}to{box-shadow:0 0 0 2px #e56c7270,0 0 24px #e56c7220}}
+.overlay{position:fixed;inset:0;z-index:10;display:none;place-items:center;background:#090b0fdd;text-align:center;padding:20px}
+.overlay.show{display:grid}
+.overlay-box{width:min(100%,430px);padding:32px;border:1px solid #82464b;border-radius:18px;background:#21191c}
+.overlay-title{font-size:clamp(2.5rem,10vw,4.5rem);font-weight:850;color:var(--red)}
+.overlay p{color:#e7d8da;line-height:1.5}
+@media(max-width:560px){body{padding:18px 12px}.topline{font-size:.68rem}.card{border-radius:16px;padding:24px 18px}.status-card{grid-template-columns:1fr}.pill{justify-self:start}.grid{grid-template-columns:1fr}.shift-tile{display:flex;justify-content:space-between;align-items:center;gap:10px}.tile-name{margin:0}.tile-sub{display:none}.actions{flex-direction:column}.footer{flex-direction:column}.clock-wrap{margin:28px 0 22px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topline">
+    <div class="brand"><span class="brand-icon">◷</span> CIMEME <span style="color:var(--muted);font-weight:500">/ ALARM</span></div>
+    <div class="live"><span class="dot" id="liveDot"></span><span id="liveLabel">Belum aktif</span></div>
+  </div>
+  <main class="card" id="mainCard">
+    <div class="eyebrow">JADWAL & PENGINGAT SHIFT</div>
+    <h1>Alarm Adit</h1>
+    <p class="subtitle">Jadwal kerja Adit, lengkap dengan pengingat waktu shift.</p>
+    <section class="clock-wrap" aria-label="Jam saat ini">
+      <div class="clock" id="currentTimeDisplay">--:--:--</div>
+      <div class="date" id="currentDateDisplay">Memuat tanggal...</div>
+    </section>
+    <section class="status-card">
+      <div>
+        <div class="status-label">Jadwal hari ini</div>
+        <div class="shift" id="shiftDisplay">Memuat jadwal...</div>
+        <div class="status-message" id="alarmTimeDisplay">Aktifkan alarm untuk mulai memantau jadwal.</div>
+      </div>
+      <div class="pill" id="statusPill">STANDBY</div>
+    </section>
+    <section class="grid" aria-label="Waktu alarm setiap shift">
+      <div class="shift-tile"><div><div class="tile-name">☀️ Shift Pagi</div><div class="tile-sub">Alarm otomatis</div></div><div class="tile-time">04.30–05.25</div></div>
+      <div class="shift-tile"><div><div class="tile-name">🌤️ Shift Siang</div><div class="tile-sub">Alarm otomatis</div></div><div class="tile-time">11.30–12.35</div></div>
+      <div class="shift-tile"><div><div class="tile-name">🌙 Shift Malam</div><div class="tile-sub">Alarm otomatis</div></div><div class="tile-time">20.30–21.15</div></div>
+    </section>
+    <div class="actions">
+      <button class="primary" id="setAlarmButton">▶ Mulai Alarm Otomatis</button>
+      <button class="danger" id="stopAlarmButton" disabled>■ Hentikan Alarm</button>
+      <button class="secondary" id="disableButton" disabled>Nonaktifkan Jadwal</button>
+    </div>
+  </main>
+  <div class="footer"><span>CIMEME · Pengingat shift Adit</span><span>Biarkan halaman ini terbuka agar pengingat tetap berjalan.</span></div>
+</div>
+<div class="overlay" id="alarmOverlay" role="alertdialog" aria-live="assertive">
+  <div class="overlay-box">
+    <div class="overlay-title">ALARM!</div>
+    <p id="overlayMessage">Waktunya mulai shift.</p>
+    <button class="danger" id="overlayStopButton">Hentikan Bunyi</button>
+  </div>
+</div>
+<script>
+"use strict";
+const jadwalAditPerTanggal = {
+  "2026-10-29":"PAGI","2026-10-30":"PAGI","2026-10-31":"PAGI",
+  "2026-11-01":"PAGI","2026-11-02":"LIBUR","2026-11-03":"PAGI",
+  "2026-11-04":"PAGI","2026-11-05":"PAGI","2026-11-06":"PAGI",
+  "2026-11-07":"PAGI","2026-11-08":"PAGI"
+};
+const waktuAlarmShift = {
+  PAGI:{start:"04:30",end:"05:25"},
+  SIANG:{start:"11:30",end:"12:35"},
+  MALAM:{start:"20:30",end:"21:15"},
+  LIBUR:{start:null,end:null}
+};
+const $=id=>document.getElementById(id);
+const timeEl=$("currentTimeDisplay"), dateEl=$("currentDateDisplay");
+const shiftEl=$("shiftDisplay"), statusEl=$("alarmTimeDisplay");
+const pill=$("statusPill"), startBtn=$("setAlarmButton"), stopBtn=$("stopAlarmButton");
+const disableBtn=$("disableButton"), overlay=$("alarmOverlay"), card=$("mainCard");
+let schedulerRunning=false, audioContext=null, timerId=null, activeDate="", activeShift="";
+let lastTriggeredKey="", manuallyStopped=false, visualTimer=null, audioNodes=[];
+function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function clock(d){return d.toLocaleTimeString("id-ID",{hour12:false,hour:"2-digit",minute:"2-digit",second:"2-digit"});}
+function minutes(t){const [h,m]=t.split(":").map(Number);return h*60+m;}
+function setPill(text,kind=""){pill.textContent=text;pill.className="pill"+(kind?" "+kind:"");}
+function clearAlarmVisual(){clearTimeout(visualTimer);visualTimer=null;card.classList.remove("alarm-flash");overlay.classList.remove("show");}
+function stopAlarm(manual=false){
+  clearAlarmVisual();
+  audioNodes.forEach(n=>{try{n.stop();}catch(e){}});
+  audioNodes=[];
+  if(manual){
+    manuallyStopped=true;
+    statusEl.textContent="Bunyi dihentikan. Pemantauan jadwal tetap aktif; alarm berikutnya masih dijadwalkan.";
+    setPill("DIBERHENTIKAN");
+  }
+}
+function beep(){
+  if(!audioContext||audioContext.state!=="running")return false;
+  const base=audioContext.currentTime;
+  [0,.42,.84,1.26,1.68,2.1].forEach(offset=>{
+    const osc=audioContext.createOscillator(), gain=audioContext.createGain();
+    osc.type="square";osc.frequency.value=880;
+    gain.gain.setValueAtTime(.0001,base+offset);
+    gain.gain.exponentialRampToValueAtTime(.16,base+offset+.02);
+    gain.gain.setValueAtTime(.16,base+offset+.19);
+    gain.gain.exponentialRampToValueAtTime(.0001,base+offset+.26);
+    osc.connect(gain);gain.connect(audioContext.destination);
+    osc.start(base+offset);osc.stop(base+offset+.28);audioNodes.push(osc);
+  });
+  return true;
+}
+function triggerAlarm(key){
+  if(lastTriggeredKey===key||manuallyStopped)return;
+  lastTriggeredKey=key;
+  card.classList.add("alarm-flash");overlay.classList.add("show");
+  $("overlayMessage").textContent=`Shift ${activeShift} dimulai. Waktu alarm ${waktuAlarmShift[activeShift].start}.`;
+  statusEl.textContent=`ALARM BERBUNYI · Shift ${activeShift}. Hentikan bunyi melalui tombol merah.`;
+  setPill("ALARM AKTIF","active");
+  if(!beep())statusEl.textContent="Alarm visual aktif, tetapi suara belum tersedia. Mulai ulang alarm setelah mengizinkan audio browser.";
+  visualTimer=setTimeout(()=>{clearAlarmVisual();audioNodes=[];},3000);
+}
+function updateSchedule(now){
+  const today=dateKey(now);
+  if(today!==activeDate){activeDate=today;activeShift=jadwalAditPerTanggal[today]||"";lastTriggeredKey="";manuallyStopped=false;}
+  if(!activeShift){
+    shiftEl.textContent="Jadwal belum tersedia";
+    statusEl.textContent=`Tidak ada data jadwal untuk ${today}. Tambahkan tanggal pada daftar jadwal.`;
+    setPill("TANPA JADWAL");return;
+  }
+  shiftEl.textContent=activeShift==="LIBUR"?"Hari ini libur":`Shift ${activeShift}`;
+  if(activeShift==="LIBUR"){
+    statusEl.textContent="Tidak ada alarm yang dijadwalkan hari ini. Selamat beristirahat.";
+    setPill("LIBUR","off");return;
+  }
+  const s=waktuAlarmShift[activeShift], cur=now.getHours()*60+now.getMinutes(), begin=minutes(s.start), end=minutes(s.end);
+  if(cur<begin){statusEl.textContent=`Alarm akan dimulai pukul ${s.start} dan berakhir pukul ${s.end}.`;setPill("MENUNGGU");return;}
+  if(cur>end||(cur===end&&now.getSeconds()>0)){statusEl.textContent=`Periode alarm ${activeShift} hari ini sudah selesai (${s.end}).`;setPill("SELESAI");return;}
+  const key=`${today}-${activeShift}-${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  if(now.getMinutes()%5===0&&!manuallyStopped&&lastTriggeredKey!==key)triggerAlarm(key);
+  else if(!overlay.classList.contains("show")){statusEl.textContent=`Periode alarm aktif ${s.start}–${s.end}. Pengulangan setiap 5 menit.`;setPill(manuallyStopped?"DIBERHENTIKAN":"AKTIF",manuallyStopped?"":"active");}
+}
+function update(){
+  const now=new Date();timeEl.textContent=clock(now);
+  dateEl.textContent=now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  if(schedulerRunning)updateSchedule(now);
+  else{
+    const shift=jadwalAditPerTanggal[dateKey(now)];
+    shiftEl.textContent=shift?(shift==="LIBUR"?"Hari ini libur":`Shift ${shift}`):"Jadwal belum tersedia";
+    statusEl.textContent=shift==="LIBUR"?"Tidak ada alarm yang dijadwalkan hari ini.":shift?`Jadwal alarm ${waktuAlarmShift[shift].start}–${waktuAlarmShift[shift].end}. Klik mulai untuk mengaktifkan.`:"Tanggal hari ini belum terdaftar di jadwal.";
+    setPill("BELUM AKTIF");
+  }
+}
+async function startScheduler(){
+  if(schedulerRunning)return;
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){audioContext=audioContext||new AC();if(audioContext.state==="suspended")await audioContext.resume();}}catch(e){console.warn("Audio belum tersedia",e);}
+  schedulerRunning=true;manuallyStopped=false;
+  startBtn.disabled=true;stopBtn.disabled=false;disableBtn.disabled=false;
+  $("liveDot").classList.add("on");$("liveLabel").textContent="Pemantauan aktif";
+  update();clearInterval(timerId);timerId=setInterval(update,250);
+}
+function disableScheduler(){
+  schedulerRunning=false;clearInterval(timerId);timerId=null;stopAlarm(false);
+  startBtn.disabled=false;stopBtn.disabled=true;disableBtn.disabled=true;
+  $("liveDot").classList.remove("on");$("liveLabel").textContent="Belum aktif";
+  setPill("DINONAKTIFKAN");statusEl.textContent="Pemantauan jadwal dinonaktifkan.";
+}
+startBtn.addEventListener("click",startScheduler);
+stopBtn.addEventListener("click",()=>stopAlarm(true));
+$("overlayStopButton").addEventListener("click",()=>stopAlarm(true));
+disableBtn.addEventListener("click",disableScheduler);
+update();setInterval(()=>{if(!schedulerRunning)update();},1000);
+</script>
+</body>
+</html>
